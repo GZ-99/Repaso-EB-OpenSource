@@ -9,8 +9,10 @@ import java.util.List;
 import java.util.Optional;
 
 public interface IngredientQueryService {
-
+  //Este es de GET
   List<Ingredient> handle(GetAllIngredientsQuery query);
+
+  //Estos no lo son
   Optional<Ingredient> handle(GetIngredientByCodeQuery query);
   boolean handle(ExistsIngredientByCodeQuery query);
 }

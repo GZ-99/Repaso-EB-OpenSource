@@ -7,8 +7,10 @@ import java.util.List;
 import java.util.Optional;
 
 public interface IngredientRepository {
-
+  //Este es de GET
   List<Ingredient> findAll();
+
+  //Estos no son de GET
   long count();
   Ingredient save(Ingredient ingredient);
   Optional<Ingredient> findByCode(IngredientCode code);

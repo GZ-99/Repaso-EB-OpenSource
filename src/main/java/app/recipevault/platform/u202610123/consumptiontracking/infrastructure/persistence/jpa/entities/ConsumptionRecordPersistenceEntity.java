@@ -6,6 +6,7 @@ import app.recipevault.platform.u202610123.shared.domain.model.valueobjects.Ingr
 import app.recipevault.platform.u202610123.shared.infrastructure.persistence.jpa.converters.IngredientCodePersistenceConverter;
 import app.recipevault.platform.u202610123.shared.infrastructure.persistence.jpa.entities.AuditableAbstractPersistenceEntity;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Past;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -36,6 +37,7 @@ public class ConsumptionRecordPersistenceEntity extends AuditableAbstractPersist
   private DietaryTag dietaryTag;
 
   @Temporal(TemporalType.TIMESTAMP)
+  @Past
   @Column(name = "recorded_at", nullable = false)
   private LocalDateTime recordedAt;
 }

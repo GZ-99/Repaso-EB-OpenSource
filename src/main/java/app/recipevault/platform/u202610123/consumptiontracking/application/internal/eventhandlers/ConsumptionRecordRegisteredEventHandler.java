@@ -20,8 +20,8 @@ public class ConsumptionRecordRegisteredEventHandler {
         this.consumptionCommandService = consumptionCommandService;
     }
 
-    @EventListener
-    public void on() {
+    //@EventListener
+    //public void on() {
 
-    }
+    //}
 }

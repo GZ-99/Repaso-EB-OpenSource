@@ -3,6 +3,7 @@ package app.recipevault.platform.u202610123.consumptiontracking.application.inte
 import app.recipevault.platform.u202610123.catalogmanagement.application.commandservices.IngredientCommandService;
 import app.recipevault.platform.u202610123.catalogmanagement.domain.model.commands.UpdateIngredientCommand;
 import app.recipevault.platform.u202610123.catalogmanagement.domain.repositories.IngredientRepository;
+import app.recipevault.platform.u202610123.consumptiontracking.application.acl.CatalogACL;
 import app.recipevault.platform.u202610123.consumptiontracking.domain.model.events.ConsumptionRecordRegisteredEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
@@ -17,24 +18,29 @@ import java.sql.Timestamp;
 public class ConsumptionRecordRegisteredEventHandler {
     private final IngredientRepository ingredientRepository;
     private final IngredientCommandService ingredientCommandService;
+    private final CatalogACL catalogACL;
 
     private static final Logger LOGGER
       = LoggerFactory.getLogger(ConsumptionRecordRegisteredEventHandler.class);
 
     public ConsumptionRecordRegisteredEventHandler(IngredientRepository ingredientRepository,
-                                                   IngredientCommandService ingredientCommandService) {
+                                                   IngredientCommandService ingredientCommandService,
+                                                   CatalogACL catalogACL) {
         this.ingredientRepository = ingredientRepository;
         this.ingredientCommandService = ingredientCommandService;
+        this.catalogACL = catalogACL;
     }
 
     @EventListener
     public void on(ConsumptionRecordRegisteredEvent event) {
-        if (ingredientRepository.existsByCode(event.ingredientCode())) {
-            var ingredient = ingredientRepository.findByCode(event.ingredientCode());
+        //var ingredient = ingredientRepository.findByCode(event.ingredientCode());
+        var ingredient = catalogACL.getIngredientData(event.ingredientCode());
+        //if (ingredientRepository.existsByCode(event.ingredientCode()))
+        if (ingredient.isPresent()) {
             var ing = ingredient.get();
-            if (event.portionGrams() < ing.getDefaultPortionGrams()) {
-                var updateIngredientCommand = new UpdateIngredientCommand(ing.getId(),
-                        ing.getCode(), ing.getName(), event.portionGrams(), ing.getBaseCaloriesPer100g());
+            if (event.portionGrams() < ing.defaultPortionGrams()) {
+                var updateIngredientCommand = new UpdateIngredientCommand(ing.id(),
+                        ing.code(), ing.name(), event.portionGrams(), ing.baseCaloriesPer100g());
                 this.ingredientCommandService.handle(updateIngredientCommand);
                 LOGGER.info("Process of Updating Portion Grams per serving completed in {}",
                         currentTimestamp());

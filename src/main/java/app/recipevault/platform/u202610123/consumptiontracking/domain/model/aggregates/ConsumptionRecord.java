@@ -1,6 +1,7 @@
 package app.recipevault.platform.u202610123.consumptiontracking.domain.model.aggregates;
 
 import app.recipevault.platform.u202610123.consumptiontracking.domain.model.commands.CreateConsumptionRecordCommand;
+import app.recipevault.platform.u202610123.consumptiontracking.domain.model.events.ConsumptionRecordRegisteredEvent;
 import app.recipevault.platform.u202610123.consumptiontracking.domain.model.valueobjects.DietaryTag;
 import app.recipevault.platform.u202610123.consumptiontracking.domain.model.valueobjects.MealType;
 import app.recipevault.platform.u202610123.shared.domain.model.aggregates.AbstractDomainAggregateRoot;
@@ -40,8 +41,8 @@ public class ConsumptionRecord extends AbstractDomainAggregateRoot<ConsumptionRe
     this.calories = command.calories();
     this.dietaryTag = command.dietaryTag();
     this.recordedAt = command.recordedAt();
-    /*this.registerEvent(new ConsumptionRecordRegisteredEvent(this,
+    this.registerEvent(new ConsumptionRecordRegisteredEvent(this,
         command.ingredientCode(),
-        command.portionGrams()));*/
+        command.portionGrams()));
   }
 }

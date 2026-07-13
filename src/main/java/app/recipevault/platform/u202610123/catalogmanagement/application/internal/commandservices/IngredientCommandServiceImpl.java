@@ -28,7 +28,7 @@ public class IngredientCommandServiceImpl implements IngredientCommandService {
       List<Ingredient> ingredients = List.of(
           new Ingredient(new IngredientCode("AV-OAT-001"), "Rolled Oats", 40.0, 389.0 ),
           new Ingredient(new IngredientCode("AV-BER-002"), "Blueberries", 100.0, 57.0 ),
-          new Ingredient(new IngredientCode("AV-OAT-001"), "Whey Protein Powder", 30.0, 400.0 ),
+          new Ingredient(new IngredientCode("AV-PRO-003"), "Whey Protein Powder", 30.0, 400.0 ),
           new Ingredient(new IngredientCode("AV-NUT-004"), "Almond Milk", 240.0, 15.0 )
       );
       ingredients.forEach(this.ingredientRepository::save);

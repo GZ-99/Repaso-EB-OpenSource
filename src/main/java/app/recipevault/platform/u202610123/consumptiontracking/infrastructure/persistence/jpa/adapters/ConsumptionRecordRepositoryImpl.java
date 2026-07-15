@@ -22,10 +22,11 @@ public class ConsumptionRecordRepositoryImpl implements ConsumptionRecordReposit
 
   @Override
   public ConsumptionRecord save(ConsumptionRecord consumptionRecord) {
+    consumptionRecord.domainEvents().forEach(applicationEventPublisher::publishEvent);
+
     var persistenceSaved = this.consumptionRecordPersistenceRepository
         .save(ConsumptionRecordPersistenceAssembler.toPersistenceFromDomain(consumptionRecord));
     var saved = ConsumptionRecordPersistenceAssembler.toDomainFromPersistence(persistenceSaved);
-    consumptionRecord.domainEvents().forEach(applicationEventPublisher::publishEvent);
     consumptionRecord.clearDomainEvents();
     return saved;
   }

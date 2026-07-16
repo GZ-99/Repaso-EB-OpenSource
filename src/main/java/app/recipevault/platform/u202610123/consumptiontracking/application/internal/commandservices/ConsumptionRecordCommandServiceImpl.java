@@ -8,33 +8,46 @@ import app.recipevault.platform.u202610123.consumptiontracking.domain.model.even
 import app.recipevault.platform.u202610123.consumptiontracking.domain.repositories.ConsumptionRecordRepository;
 import app.recipevault.platform.u202610123.shared.application.result.ApplicationError;
 import app.recipevault.platform.u202610123.shared.application.result.Result;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 @Service
 public class ConsumptionRecordCommandServiceImpl implements ConsumptionRecordCommandService {
   private final ConsumptionRecordRepository consumptionRecordRepository;
   private final CatalogACL catalogACL;
+  private final ApplicationEventPublisher eventPublisher;
   public ConsumptionRecordCommandServiceImpl(ConsumptionRecordRepository consumptionRecordRepository,
-                                             CatalogACL catalogACL) {
+                                             CatalogACL catalogACL,
+                                             ApplicationEventPublisher eventPublisher) {
     this.consumptionRecordRepository = consumptionRecordRepository;
     this.catalogACL = catalogACL;
+    this.eventPublisher = eventPublisher;
   }
 
   @Override
   public Result<Long, ApplicationError> handle(CreateConsumptionRecordCommand command) {
     var ingredientCode = command.ingredientCode();
     var ingredient = catalogACL.getIngredientData(command.ingredientCode());
-    var consumptionRecord = new ConsumptionRecord(command);
-    if (ingredient.isPresent()) {
-      try {
-        consumptionRecord = this.consumptionRecordRepository.save(consumptionRecord);
-      } catch (Exception e) {
-        return Result.failure(ApplicationError.unexpected("consumption-record", e.getMessage()));
-      }
-      return Result.success(consumptionRecord.getId());
+
+    if (ingredient.isEmpty()) {
+      return Result.failure(
+              ApplicationError.notFound("ingredient", ingredientCode.code()));
     }
-    else {
-      return Result.failure(ApplicationError.notFound("ingredient", ingredientCode.code()));
+
+    var consumptionRecord = new ConsumptionRecord(command);
+
+    try {
+      consumptionRecord = this.consumptionRecordRepository.save(consumptionRecord);
+      eventPublisher.publishEvent(
+              new ConsumptionRecordRegisteredEvent(
+                      command.ingredientCode(),
+                      command.portionGrams()
+              )
+      );
+      return Result.success(consumptionRecord.getId());
+    } catch (Exception e) {
+      return Result.failure(
+              ApplicationError.unexpected("consumption-record", e.getMessage()));
     }
   }
 }

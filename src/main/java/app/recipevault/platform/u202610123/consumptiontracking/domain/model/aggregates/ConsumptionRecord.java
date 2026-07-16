@@ -41,7 +41,7 @@ public class ConsumptionRecord extends AbstractDomainAggregateRoot<ConsumptionRe
     this.calories = command.calories();
     this.dietaryTag = command.dietaryTag();
     this.recordedAt = command.recordedAt();
-    this.registerEvent(new ConsumptionRecordRegisteredEvent(this,
+    this.registerEvent(new ConsumptionRecordRegisteredEvent(
         command.ingredientCode(),
         command.portionGrams()));
   }
